@@ -65,9 +65,9 @@ The live Jev integration was smoke-tested separately with a short, non-sensitive
 
 ## Deployment
 
-`Dockerfile` builds the static UI and runs the Express API in one container. `compose.yaml` is configured for the existing Hetzner Caddy network `easy-scraper_default`; edit that network name for other hosts. Keep the application port private behind a TLS reverse proxy—do not expose the Jev-backed endpoint directly to the public internet without rate limits.
+`Dockerfile` builds the static UI and runs the Express API in one container. `compose.yaml` joins the existing Hetzner Caddy network `easy-scraper_default`; change that network name for other hosts. The sample Caddy site for `jev-signal.apimix.dev` is versioned at [`deploy/jev-signal.apimix.dev.caddy`](deploy/jev-signal.apimix.dev.caddy). Keep the application port private behind the TLS reverse proxy—do not expose the Jev-backed endpoint directly to the public internet without rate limits.
 
-The deployment-specific Caddy site file is maintained on the server, not in this repo. Set the production `JEV_API_KEY` and a unique `RATE_LIMIT_SALT` in the server's ignored `.env` before starting Compose.
+For this host, deploy the Compose service from `/opt/jev-signal` and copy the Caddy site file into `/opt/api-factory/deploy/caddy/jev-signal.apimix.dev.caddy`, then reload the shared Caddy container. Set production `JEV_API_KEY` and a unique `RATE_LIMIT_SALT` in the server’s ignored `.env` before starting Compose.
 
 ## Research
 

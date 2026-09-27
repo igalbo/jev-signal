@@ -1,0 +1,4 @@
+jev-signal.apimix.dev {
+  encode zstd gzip
+  reverse_proxy jev-signal:8787
+}
