@@ -26,7 +26,7 @@ cp .env.example .env
 npm run dev
 ```
 
-The API listens on `PORT` (default `8787`) and Vite proxies `/api` to it. Open the Vite URL printed in the terminal. For production-like local testing, run `npm run build` then `npm start`.
+The API listens on `PORT` (default `8787`) and both the server and Vite read that value from `.env`; the `/api` development proxy follows it. Open the Vite URL printed in the terminal. For production-like local testing, run `npm run build` then `npm start`.
 
 ### Environment
 

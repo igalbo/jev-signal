@@ -115,11 +115,11 @@ function App() {
           </div>
           <div className="analysis-grid">
             <div className="input-panel panel">
-              <div className="panel-label"><span className="label-index">A</span><span>PASTE TEXT TO INSPECT</span><span className="private-tag"><i /> NOT STORED</span></div>
+              <div className="panel-label"><span className="label-index">A</span><span>PASTE TEXT TO INSPECT</span><span className="private-tag"><i /> NO APP TEXT HISTORY</span></div>
               <label className="sr-only" htmlFor="text-input">Text to inspect</label>
-              <textarea id="text-input" value={text} maxLength={characterLimit} onChange={(event) => { setText(event.target.value); setAnalysis(null); setError('') }} placeholder="Paste a post, paragraph, or short article…" />
+              <textarea id="text-input" value={text} maxLength={characterLimit} onChange={(event) => { setText(event.target.value); setAnalysis(null); setError('') }} placeholder="Paste a post, paragraph, or short article (50+ characters)…" />
               <div className="input-footer"><span>{wordCount.toLocaleString()} words · {text.length.toLocaleString()} / {characterLimit.toLocaleString()} characters</span><button className="clear-button" onClick={() => { setText(''); setAnalysis(null); setError('') }} disabled={!text}>Clear</button></div>
-              <div className="privacy-inline"><span className="lock" aria-hidden="true">⌑</span> Sent to Jev for judgment. Never saved by Signal.</div>
+              <div className="privacy-inline"><span className="lock" aria-hidden="true">⌑</span> Sent to Jev for scoring; Signal doesn’t keep an app text history.</div>
               <button className="analyze-button" onClick={analyze} disabled={loading || text.trim().length < 50}>
                 {loading ? <><span className="spinner" /> Reading the signals…</> : <>Inspect the writing <span aria-hidden="true">↗</span></>}
               </button>
@@ -138,7 +138,7 @@ function App() {
                 </div>
               ) : (
                 <div className="readout">
-                  <div className="readout-top"><div><div className="panel-label"><span className="label-index">B</span><span>YOUR READOUT</span></div><h3>{signalLabel(analysis.overall)}</h3><p>Average signal · {analysis.overall.toFixed(1)} / 4</p></div><div className="score-orb" style={{ '--score': `${(analysis.overall / 4) * 100}%` } as CSSProperties}><div><strong>{analysis.overall.toFixed(1)}</strong><small>/ 4</small></div></div></div>
+                  <div className="readout-top"><div><div className="panel-label"><span className="label-index">B</span><span>YOUR READOUT</span></div><h3>{signalLabel(analysis.overall)}</h3><p>Equal-weight heuristic · higher means more flagged patterns</p></div><div className="score-orb" style={{ '--score': `${(analysis.overall / 4) * 100}%` } as CSSProperties}><div><strong>{analysis.overall.toFixed(1)}</strong><small>/ 4</small></div></div></div>
                   <div className="dimension-list">
                     {dimensions.map(({ key, label, short, icon }) => {
                       const value = analysis.dimensionAverages[key]
@@ -177,7 +177,7 @@ function App() {
           <div className="method-copy"><p>Good writing can be AI-assisted. Bad writing can be entirely human. Signal doesn’t pretend to know the author—it checks for patterns readers may want to question.</p><div className="method-cards"><div><span>01 / MEASURE</span><b>Five independent signals</b><small>Specificity, substance, grounding, formula, and engagement bait.</small></div><div><span>02 / SHOW</span><b>Keep the context</b><small>Scores stay attached to the paragraph they describe.</small></div><div><span>03 / YOU DECIDE</span><b>No auto-hiding</b><small>A flag is a prompt to look again, not a verdict.</small></div></div></div>
         </section>
 
-        <section className="privacy-section"><div className="privacy-mark" aria-hidden="true">⌑</div><div><div className="eyebrow"><span>05</span> YOUR TEXT</div><h2>Private by default.</h2><p>Text travels from your browser to this service and is forwarded to TypeSafe Jev for the check. Signal does not write it to a database or application logs; TypeSafe’s own data handling is separate. Don’t submit sensitive or confidential material.</p></div><span className="privacy-badge"><i /> NO TEXT HISTORY</span></section>
+        <section className="privacy-section"><div className="privacy-mark" aria-hidden="true">⌑</div><div><div className="eyebrow"><span>05</span> YOUR TEXT</div><h2>Private by default.</h2><p>Text travels from your browser to this service and is forwarded to TypeSafe Jev for the check. Signal does not retain it in an app database or application logs; TypeSafe’s own data handling is separate. Don’t submit sensitive or confidential material.</p></div><span className="privacy-badge"><i /> NO APP TEXT HISTORY</span></section>
       </main>
 
       <footer className="footer"><a className="brand" href="#top"><span className="brand-mark" aria-hidden="true">S<span>•</span></span><span>signal<span className="brand-light"> / jev</span></span></a><span>A tool for attention, not attribution.</span><a href="https://github.com/igalbo/jev-signal" target="_blank" rel="noreferrer">Source code ↗</a></footer>

@@ -13,7 +13,7 @@ let inFlight = 0
 const maxConcurrent = Number(process.env.MAX_CONCURRENT_ANALYSES || 4)
 
 app.disable('x-powered-by')
-app.set('trust proxy', 1)
+app.set('trust proxy', 1) // One Caddy hop; Compose keeps the app off public host ports.
 app.use(express.json({ limit: '34kb' }))
 
 app.get('/api/health', (_req, res) => {
