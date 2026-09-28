@@ -168,7 +168,7 @@ function App() {
           </div>
 
           {analysis && <section className="paragraph-results" aria-label="Paragraph review">
-            <div className="paragraph-heading"><div><div className="eyebrow"><span>03</span> PARAGRAPH REVIEW</div><h2>Where the signals live.</h2></div><label className="threshold-control"><span>Flag high-concern scores above <b>{threshold.toFixed(1)}</b></span><input type="range" min="0" max="4" step="0.1" value={threshold} onChange={(event) => updateThreshold(Number(event.target.value))} aria-label="Highlight threshold; higher scores mean more writing concerns" /></label></div>
+            <div className="paragraph-heading"><div><div className="eyebrow"><span>03</span> PARAGRAPH REVIEW</div><h2>Where the signals live.</h2></div><label className="threshold-control"><span>Flag high-concern scores at or above <b>{threshold.toFixed(1)}</b></span><input type="range" min="0" max="4" step="0.1" value={threshold} onChange={(event) => updateThreshold(Number(event.target.value))} aria-label="Highlight threshold; higher scores mean more writing concerns" /></label></div>
             <div className="paragraph-list">{analysis.paragraphs.map((paragraph, index) => {
               const flagged = paragraph.average >= threshold
               return <article className={`paragraph-card ${flagged ? 'is-flagged' : ''}`} key={paragraph.id}>
