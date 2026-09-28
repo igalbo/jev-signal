@@ -6,6 +6,7 @@ type Score = { score: number; strongestProbability: number; probabilities: Recor
 type ParagraphResult = { id: string; text: string; average: number; scores: Record<DimensionKey, Score> }
 type Analysis = {
   paragraphs: ParagraphResult[]
+  aiAuthorship: Score
   dimensionAverages: Record<DimensionKey, number>
   overall: number
   model: string
@@ -23,10 +24,16 @@ const sampleText = `In today's fast-paced world, businesses need to embrace inno
 const characterLimit = 30_000
 
 function signalLabel(value: number) {
-  if (value < 0.9) return 'Low signal'
-  if (value < 1.8) return 'Some signals'
-  if (value < 2.8) return 'Elevated signals'
-  return 'Strong signals'
+  if (value < 0.9) return 'Few concerns — good'
+  if (value < 1.8) return 'Mostly clear'
+  if (value < 2.8) return 'Mixed — review it'
+  return 'Many concerns — review it'
+}
+
+function aiAuthorshipLabel(value: number) {
+  if (value < 1.5) return 'More human-like style'
+  if (value < 2.5) return 'Unclear / mixed'
+  return 'More AI-like style'
 }
 
 function App() {
@@ -70,9 +77,9 @@ function App() {
   async function copySummary() {
     if (!analysis) return
     const lines = [
-      `Signal summary: ${signalLabel(analysis.overall)} (${analysis.overall.toFixed(1)}/4)`,
+      `Writing concerns: ${signalLabel(analysis.overall)} (${analysis.overall.toFixed(1)}/4; lower is better)`,
       ...dimensions.map(({ key, label }) => `${label}: ${analysis.dimensionAverages[key].toFixed(1)}/4`),
-      'This estimates writing signals, not AI authorship.',
+      `AI-style estimate: ${aiAuthorshipLabel(analysis.aiAuthorship.score)} (${analysis.aiAuthorship.score.toFixed(1)}/4) — style guess, not proof of authorship.`,
     ]
     await navigator.clipboard.writeText(lines.join('\n'))
   }
@@ -84,7 +91,7 @@ function App() {
           <span className="brand-mark" aria-hidden="true">S<span>•</span></span>
           <span>signal<span className="brand-light"> / jev</span></span>
         </a>
-        <div className="topbar-note"><span className="status-dot" /> A reader’s tool, not an authorship detector</div>
+        <div className="topbar-note"><span className="status-dot" /> Writing clues, not proof of who wrote it</div>
         <a className="github-link" href="https://github.com/igalbo/jev-signal" target="_blank" rel="noreferrer">Open source <span aria-hidden="true">↗</span></a>
       </header>
 
@@ -94,7 +101,7 @@ function App() {
             <div className="eyebrow"><span>01</span> READING SIGNALS</div>
             <h1>Does this say<br /><em>anything?</em></h1>
             <p className="hero-deck">A second set of eyes for writing that feels polished but says very little. Inspect the signals. You make the call.</p>
-            <div className="hero-points"><span><b>↗</b> Paragraph-level</span><span><b>↗</b> Five separate signals</span><span><b>↗</b> No AI-authorship guess</span></div>
+            <div className="hero-points"><span><b>↗</b> Paragraph-level</span><span><b>↗</b> Five writing signals</span><span><b>↗</b> Separate AI-style estimate</span></div>
           </div>
           <div className="hero-art" aria-hidden="true">
             <div className="orbit orbit-one" /><div className="orbit orbit-two" />
@@ -133,12 +140,18 @@ function App() {
                   <div className="empty-symbol" aria-hidden="true"><span>···</span><i /><b /></div>
                   <span className="empty-kicker">YOUR READOUT</span>
                   <h3>Signals, not a sentence.</h3>
-                  <p>We’ll break the passage into paragraphs and show which qualities stand out—not whether a machine wrote it.</p>
-                  <div className="empty-axis"><span>0</span><i /><span>4</span><small>NO SIGNAL <b>STRONG SIGNAL</b></small></div>
+                  <p>We’ll score writing concerns and show a separate, uncertain AI-style estimate. Neither is proof of who wrote the passage.</p>
+                  <div className="empty-axis"><span>0</span><i /><span>4</span><small>FEW CONCERNS · BETTER <b>MANY · WORSE</b></small></div>
                 </div>
               ) : (
                 <div className="readout">
-                  <div className="readout-top"><div><div className="panel-label"><span className="label-index">B</span><span>YOUR READOUT</span></div><h3>{signalLabel(analysis.overall)}</h3><p>Equal-weight heuristic · higher means more flagged patterns</p></div><div className="score-orb" style={{ '--score': `${(analysis.overall / 4) * 100}%` } as CSSProperties}><div><strong>{analysis.overall.toFixed(1)}</strong><small>/ 4</small></div></div></div>
+                  <div className="readout-top"><div><div className="panel-label"><span className="label-index">B</span><span>WRITING-CONCERN SCORE</span></div><h3>{signalLabel(analysis.overall)}</h3><p>0 = few concerns · 4 = many · lower is better</p></div><div className="score-orb" style={{ '--score': `${(analysis.overall / 4) * 100}%` } as CSSProperties}><div><strong>{analysis.overall.toFixed(1)}</strong><small>/ 4</small></div></div></div>
+                  <div className="ai-estimate" aria-label="Separate AI-style estimate">
+                    <div className="ai-estimate-copy"><span>JEV’S AI-STYLE ESTIMATE</span><strong>{aiAuthorshipLabel(analysis.aiAuthorship.score)}</strong></div>
+                    <span className="ai-estimate-score">{analysis.aiAuthorship.score.toFixed(1)}<small>/ 4</small></span>
+                    <div className="ai-style-scale"><span>Human-like</span><div className="ai-style-track"><i style={{ left: `${(analysis.aiAuthorship.score / 4) * 100}%` }} /></div><span>AI-like</span></div>
+                    <p className="ai-estimate-note">A style-based guess, not proof of authorship. It is separate from the writing-concern score.</p>
+                  </div>
                   <div className="dimension-list">
                     {dimensions.map(({ key, label, short, icon }) => {
                       const value = analysis.dimensionAverages[key]
@@ -155,7 +168,7 @@ function App() {
           </div>
 
           {analysis && <section className="paragraph-results" aria-label="Paragraph review">
-            <div className="paragraph-heading"><div><div className="eyebrow"><span>03</span> PARAGRAPH REVIEW</div><h2>Where the signals live.</h2></div><label className="threshold-control"><span>Flag above <b>{threshold.toFixed(1)}</b></span><input type="range" min="0" max="4" step="0.1" value={threshold} onChange={(event) => updateThreshold(Number(event.target.value))} aria-label="Highlight threshold" /></label></div>
+            <div className="paragraph-heading"><div><div className="eyebrow"><span>03</span> PARAGRAPH REVIEW</div><h2>Where the signals live.</h2></div><label className="threshold-control"><span>Flag high-concern scores above <b>{threshold.toFixed(1)}</b></span><input type="range" min="0" max="4" step="0.1" value={threshold} onChange={(event) => updateThreshold(Number(event.target.value))} aria-label="Highlight threshold; higher scores mean more writing concerns" /></label></div>
             <div className="paragraph-list">{analysis.paragraphs.map((paragraph, index) => {
               const flagged = paragraph.average >= threshold
               return <article className={`paragraph-card ${flagged ? 'is-flagged' : ''}`} key={paragraph.id}>
@@ -168,7 +181,7 @@ function App() {
                 })}</div>
               </article>
             })}</div>
-            <p className="calibration-note">The flag is your adjustable reading threshold, not a probability that this text is AI-generated.</p>
+            <p className="calibration-note">Paragraph flags use writing concerns only—not the separate AI-style estimate. Lower concern scores are better; no score proves who wrote the text.</p>
           </section>}
         </section>
 

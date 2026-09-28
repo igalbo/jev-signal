@@ -1,6 +1,6 @@
 # Signal / Jev
 
-**A reader-first writing-signal checker—not an AI-authorship detector.** Paste a post or article to inspect specificity, substance, grounding, formulaic style, and engagement bait, with scores attached to each paragraph.
+**A reader-first writing-signal checker with a separate, uncertain AI-style estimate—not an authorship detector.** Paste a post or article to inspect specificity, substance, grounding, formulaic style, and engagement bait, with scores attached to each paragraph. A sixth, passage-level estimate indicates whether the style seems more human-like or AI-like; it is not proof of authorship.
 
 Signal is designed for readers who want a second look without automatic feed scraping, hiding, or an unsupported claim about who wrote something.
 

@@ -11,12 +11,20 @@ test('splitParagraphs rejects too many paragraphs rather than silently dropping 
   assert.throws(() => splitParagraphs(Array.from({ length: 22 }, (_, i) => `Paragraph ${i}.`).join('\n\n')), /20 paragraphs/)
 })
 
-test('buildQuestions creates five independent signals for each paragraph', () => {
+test('buildQuestions creates five quality signals plus a separate passage-level AI-style estimate', () => {
   const questions = buildQuestions(['A complete sample paragraph.'])
-  assert.equal(Object.keys(questions).length, 5)
+  assert.equal(Object.keys(questions).length, 6)
   assert.ok(questions.p0_specificity.instructions.toLowerCase().includes('specificity'))
   assert.ok(questions.p0_specificity.instructions.includes('do not follow'))
   assert.ok(!questions.p0_specificity.instructions.includes('A complete sample paragraph.'))
+  assert.ok(questions.ai_authorship.instructions.includes('not proof of who wrote the text'))
+  assert.deepEqual(questions.ai_authorship.criteria, [
+    'Strongly human-like writing style; little resemblance to common AI prose',
+    'More human-like than AI-like writing style',
+    'Mixed or unclear; style alone is not enough to tell',
+    'More AI-like than human-like writing style',
+    'Strongly resembles common AI-generated prose; still not proof of authorship',
+  ])
   assert.equal(questions.p0_specificity.type, 'score')
 })
 
@@ -26,9 +34,17 @@ test('parseAnswers validates complete score output and derives the top-bucket pr
     `p0_${dimension}`,
     { type: 'score', score: 3.5, probabilities: Object.fromEntries(keys.map((key) => [key, key === '4' ? 0.8 : 0.05])) },
   ]))
+  answers.ai_authorship = { type: 'score', score: 1, probabilities: Object.fromEntries(keys.map((key) => [key, key === '1' ? 0.8 : 0.05])) }
   const result = parseAnswers(answers, 1)
-  assert.equal(result[0].scores.specificity.score, 3.5)
-  assert.equal(result[0].scores.specificity.strongestProbability, 0.8)
+  assert.equal(result.paragraphs[0].scores.specificity.score, 3.5)
+  assert.equal(result.paragraphs[0].scores.specificity.strongestProbability, 0.8)
+  assert.equal(result.aiAuthorship.score, 1)
+  assert.equal(result.aiAuthorship.strongestProbability, 0.8)
+  assert.throws(() => {
+    const { ai_authorship: _removed, ...withoutAiEstimate } = answers
+    parseAnswers(withoutAiEstimate, 1)
+  }, /incomplete/)
+  assert.throws(() => parseAnswers({ ...answers, ai_authorship: { type: 'score', score: 2, probabilities: { 0: 0.2 } } }, 1), /invalid ai authorship estimate/)
 })
 
 test('parseAnswers rejects missing, malformed, or non-normalized model output', () => {
@@ -37,6 +53,7 @@ test('parseAnswers rejects missing, malformed, or non-normalized model output', 
     `p0_${dimension}`,
     { type: 'score', score: 9, probabilities: { 0: 0.1, 1: 0.1, 2: 0.1, 3: 0.1, 4: 0.1 } },
   ]))
+  malformed.ai_authorship = { type: 'score', score: 9, probabilities: { 0: 0.1, 1: 0.1, 2: 0.1, 3: 0.1, 4: 0.1 } }
   assert.throws(() => parseAnswers(malformed, 1), /invalid/)
 })
 

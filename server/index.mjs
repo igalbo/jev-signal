@@ -55,6 +55,7 @@ app.post('/api/analyze', async (req, res) => {
     const overall = Object.values(dimensionAverages).reduce((sum, score) => sum + score, 0) / Object.keys(dimensionAverages).length
     res.json({
       paragraphs: paragraphs.map((paragraph, index) => ({ text: paragraph, ...analysis.paragraphs[index] })),
+      aiAuthorship: analysis.aiAuthorship,
       dimensionAverages,
       overall,
       model: analysis.model,
