@@ -7,8 +7,10 @@ test('splitParagraphs preserves source text while normalizing paragraph separato
   assert.deepEqual(splitParagraphs('  First paragraph.\n\nSecond paragraph.  '), ['First paragraph.', 'Second paragraph.'])
 })
 
-test('splitParagraphs rejects too many paragraphs rather than silently dropping text', () => {
-  assert.throws(() => splitParagraphs(Array.from({ length: 22 }, (_, i) => `Paragraph ${i}.`).join('\n\n')), /20 paragraphs/)
+test('splitParagraphs accepts more than 20 paragraphs within the character limit', () => {
+  const input = Array.from({ length: 25 }, (_, i) => `Paragraph ${i + 1}.`).join('\n\n')
+  assert.equal(splitParagraphs(input).length, 25)
+  assert.equal(splitParagraphs('A'.repeat(6_000))[0].length, 6_000)
 })
 
 test('buildQuestions creates five quality signals plus a separate passage-level AI-style estimate', () => {
@@ -26,6 +28,8 @@ test('buildQuestions creates five quality signals plus a separate passage-level 
     'Strongly resembles common AI-generated prose; still not proof of authorship',
   ])
   assert.equal(questions.p0_specificity.type, 'score')
+  const manyParagraphQuestions = buildQuestions(Array.from({ length: 25 }, () => 'A paragraph.'))
+  assert.equal(Object.keys(manyParagraphQuestions).length, 126)
 })
 
 test('parseAnswers validates complete score output and derives the top-bucket probability', () => {

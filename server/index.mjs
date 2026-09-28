@@ -2,7 +2,7 @@ import 'dotenv/config'
 import crypto from 'node:crypto'
 import path from 'node:path'
 import express from 'express'
-import { DIMENSIONS, MAX_PARAGRAPHS, MAX_TEXT_CHARS, scoreParagraphs, splitParagraphs } from './scoring.mjs'
+import { DIMENSIONS, MAX_TEXT_CHARS, scoreParagraphs, splitParagraphs } from './scoring.mjs'
 import { createRateLimiter } from './rate-limit.mjs'
 
 const app = express()
@@ -14,7 +14,7 @@ const maxConcurrent = Number(process.env.MAX_CONCURRENT_ANALYSES || 4)
 
 app.disable('x-powered-by')
 app.set('trust proxy', 1) // One Caddy hop; Compose keeps the app off public host ports.
-app.use(express.json({ limit: '34kb' }))
+app.use(express.json({ limit: '256kb' }))
 
 app.get('/api/health', (_req, res) => {
   res.set('Cache-Control', 'no-store')
@@ -61,7 +61,7 @@ app.post('/api/analyze', async (req, res) => {
       model: analysis.model,
       usage: analysis.usage,
       analyzedAt: new Date().toISOString(),
-      limits: { maxParagraphs: MAX_PARAGRAPHS, maxCharacters: MAX_TEXT_CHARS },
+      limits: { maxCharacters: MAX_TEXT_CHARS },
     })
   } catch (error) {
     const isTimeout = error?.name === 'TimeoutError' || error?.name === 'AbortError'

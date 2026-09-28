@@ -42,7 +42,6 @@ export const AI_AUTHORSHIP_LEGEND = [
   'Strongly resembles common AI-generated prose; still not proof of authorship',
 ]
 
-export const MAX_PARAGRAPHS = 20
 export const MAX_TEXT_CHARS = 30_000
 
 export function splitParagraphs(text) {
@@ -51,12 +50,6 @@ export function splitParagraphs(text) {
     .split(/\n\s*\n+/)
     .map((part) => part.trim())
     .filter(Boolean)
-  if (paragraphs.length > MAX_PARAGRAPHS) {
-    throw new Error(`Keep the analysis to ${MAX_PARAGRAPHS} paragraphs or fewer.`)
-  }
-  if (paragraphs.some((part) => part.length > 5_000)) {
-    throw new Error('Break paragraphs longer than 5,000 characters into smaller sections.')
-  }
   return paragraphs
 }
 
