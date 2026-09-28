@@ -15,8 +15,8 @@ The projects are very new. In this snapshot, developer tooling attracts the most
 
 ## Gaps and design decisions
 
-1. **Don't claim AI authorship from prose style.** Human-written text can be formulaic and AI-assisted writing can be useful. Signal reports writing qualities only; it never emits “human-written” or “AI-written.”
-2. **Show the evidence at the unit the reader can judge.** A single post score hides which part triggered it. Signal scores each paragraph and exposes five separate dimensions plus the source paragraph.
+1. **Separate style resemblance from authorship claims.** Human-written text can be formulaic and AI-assisted writing can be useful. Signal offers a distinct, uncertain passage-level AI-style estimate, labels its limits, and does not present it as proof of who wrote the text.
+2. **Show the evidence at the unit the reader can judge.** A single post score hides which part triggered it. Signal scores each paragraph across five writing dimensions and exposes the source paragraph; the AI-style estimate is passage-level and separate.
 3. **Avoid tying the product to one brittle social DOM.** Feed extensions gain convenience but inherit hashed selectors, page changes, and broad permissions. Signal begins with user-selected/pasted text and works across websites without scraping a feed. A future extension should inspect only text the user explicitly selects.
 4. **Make the threshold inspectable and reversible.** Readers choose their own highlight threshold; Signal never hides, reports, or blocks a post.
 5. **Minimize retention.** The app stores no passage, score history, or user vote on its server. Text still goes to TypeSafe for judgment, and the privacy notice says so plainly. The service uses request caps and server-side keys.
@@ -25,7 +25,7 @@ The projects are very new. In this snapshot, developer tooling attracts the most
 
 ## Product scope
 
-The shipped MVP is a responsive paste-and-review website, not a social feed scraper. It makes the review loop cross-site and portable while preserving paragraph context and user control. The adjustable threshold and no-retention backend are deliberate differentiators; browser-extension capture is a follow-up only if users value the workflow enough to justify its extra permissions and review burden.
+The shipped MVP is a responsive paste-and-review website, not a social feed scraper. It makes the review loop cross-site and portable while preserving paragraph context and user control. The adjustable threshold, separately labeled AI-style estimate, and no-retention backend are deliberate differentiators; browser-extension capture is a follow-up only if users value the workflow enough to justify its extra permissions and review burden.
 
 ## Primary references
 

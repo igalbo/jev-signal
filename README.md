@@ -6,14 +6,14 @@ Signal is designed for readers who want a second look without automatic feed scr
 
 ## What it does
 
-- Scores five separate writing signals on a 0–4 scale using TypeSafe Jev / System One.
+- Scores five separate writing concerns on a 0–4 scale using TypeSafe Jev / System One, plus a separate passage-level AI-style estimate.
 - Keeps each score attached to the paragraph being judged; reports Jev's probability distribution, not just a binary label.
 - Lets readers adjust their own highlight threshold. That preference stays in browser local storage; text and analysis results do not.
 - Supports any copied text rather than relying on fragile selectors for one social network.
 - Limits inputs to 30,000 characters / 20 paragraphs and applies per-client plus global rate limits.
 - Keeps the Jev API key on the server. The browser never receives the secret.
 
-**Important:** the aggregate is a simple mean of five subjective signals. It is not a probability that the passage is AI-generated, a factuality check, or evidence of authorship. Scores can be wrong, especially across genres and languages; do not use them for moderation, employment, grading, or other consequential decisions.
+**Score direction:** for writing concerns, 0 means few concerns and 4 means many; **lower is better**. The aggregate is a simple mean of the five subjective writing signals. The separate AI-style estimate runs from 0 (more human-like style) to 4 (more AI-like style). Neither score is a validated detector, factuality check, or evidence of who wrote the text. Scores can be wrong, especially across genres and languages; do not use them for moderation, employment, grading, or other consequential decisions.
 
 ## Run locally
 
@@ -43,7 +43,7 @@ The production endpoint limits each client to 8 analyses per 10 minutes and 40 p
 
 ## How the judgments work
 
-For every paragraph, the server asks one Jev request with five independent `score` questions. The 0–4 rubric describes increasing presence of a signal. We show the score and the strongest score-band probability. Scores and rubric thresholds are starting points, not validated accuracy claims. The request asks Jev to treat passage text as untrusted content, not instructions.
+For every paragraph, the server asks Jev five independent `score` questions. A sixth question considers the complete passage and estimates whether its writing style seems more human-like or AI-like. The writing-concern rubric increases from few to many concerns; the separate AI-style rubric increases from human-like to AI-like. We show the score and (for the paragraph signals) the strongest score-band probability. These judgments are starting points, not validated accuracy claims. The request asks Jev to treat passage text as untrusted content, not instructions.
 
 Dimensions:
 
